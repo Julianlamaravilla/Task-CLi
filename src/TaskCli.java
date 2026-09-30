@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class taskCli {
+public class TaskCli {
 
     // Those two lines define where and how your application references the file where tasks are saved on disk
     private static final String FILE_NAME = "task.json";
