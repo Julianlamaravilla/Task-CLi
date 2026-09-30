@@ -189,4 +189,29 @@ public class taskCli {
         return val;
     }
 
+    private static Task findTasksById(List<Task> tasks, int id){
+        return tasks.stream().filter(t -> t.id == id).findFirst().orElse(null);
+    }
+
+    private static String getCurrentTimestamp(){
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    private static String escape(String input){
+        return input.replace("\"","\\\"");
+    }
+
+    private static String unescape(String input){
+        return input.replace("\\\"", "\"");
+    }
+
+    private static void printUsage(){
+        System.out.println("Usage:");
+        System.out.println("  task-cli add \"<description>\"");
+        System.out.println("  task-cli update <id> \"<description>\"");
+        System.out.println("  task-cli delete <id>");
+        System.out.println("  task-cli mark-in-progress <id>");
+        System.out.println("  task-cli mark-done <id>");
+        System.out.println("  task-cli list [todo|in-progress|done]");
+    }
 }
