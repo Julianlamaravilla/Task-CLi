@@ -38,10 +38,69 @@ public class taskCli {
             printUsage();
             return;
         }
+
+        String action = args[0].toLoewrCase();
+        List<Task> tasks = loadTasks();
+
+        try {
+            switch (action){
+                case "add":
+                    if(args.length < 2){
+                        System.out.println("Error: Description required. Usage : task-cli add \"description\"");
+                        return;
+                    }
+                    addTask(tasks, args[1]);
+                    break;
+
+                case "update":
+                    if(args.length < 3){
+                        System.out.println("Error : ID and description required. Usage: task-cli update <id> \"description\"");
+                        return;
+                    }
+                    updateTask(tasks, Integer.parseInt(args[1]), args[2]);
+                    break;
+
+                case  "delete":
+                    if(args.length < 2){
+                        System.out.println("Error : ID required. Usage: tasks-cli delete <id>");
+                        return;
+                    }
+                    deleteTask(tasks, Integer.parseInt(args[1]));
+                    break;
+
+                case "mark-in-progress":
+                    if(args.length < 2){
+                        System.out.print("Error: ID required. Usage: task-cli mark-in-progress <id>");
+                        return;
+                    }
+                    updateStatus(tasks, Integer.parseInt(args[1]), "in-progress");
+                    break;
+
+                case "mark-done":
+                    if (args.length < 2){
+                        System.out.println("Error: ID required. Usage: tasks-cli mark-done <id>");
+                        return;
+                    }
+                    updateStatus(tasks, Integer.parseInt(args[1]), "done");
+                    break;
+
+                case "list":
+                    String filter = args.length > 1 ? args[1].toLowerCase() : "all";
+                    listTasks(tasks, filter);
+                    break;
+
+                default:
+                    System.out.println("Unknow command: " + action);
+                    printUsage();
+            }
+        } catch (NumberFormatException e){
+            System.out.println("Error: Task ID must be a valid number.");
+        } catch (Exception e){
+            System.out.println("An unexpected error occurred: " + e.getMessage() );
+        }
     }
 
-    String action = args[0].toLoewrCase();
-    List<Task> tasks = loadTasks();
+
 
 
     // missing try and catch
@@ -56,7 +115,7 @@ public class taskCli {
     }
 
     private static void updateTask(List<Task> tasks , int id , String newDescription){
-        Task task = findTaskbyId(tasks, id);
+        Task task = findTasksById(tasks, id);
         if (task == null){
             System.out.println("Error: Task with ID" + id + "not found.");
             return;
@@ -81,7 +140,7 @@ public class taskCli {
     }
 
     private static void updateStatus(List<Task> tasks , int id, String status){
-        Task task = findTaskById(tasks , id);
+        Task task = findTasksById(tasks , id);
         if (task == null){
             System.out.println("Error : Task with ID  " + id + " not found");
         }
@@ -138,8 +197,8 @@ public class taskCli {
                     int id = Integer.parseInt(extractJsonValue(objStr, "id"));
                     String description = unescape(extractJsonValue(objStr, "description"));
                     String status = extractJsonValue(objStr, "status");
-                    String createAt = extracJsonvalue(objStr, "createAt");
-                    String updateAt = extracJsonValue(objStr, "updateAt");
+                    String createAt = extractJsonValue(objStr, "createAt");
+                    String updateAt = extractJsonValue(objStr, "updateAt");
 
                     tasks.add(new Task(id,description, status, createAt, updateAt));
                 }
@@ -158,7 +217,7 @@ public class taskCli {
                     .append("    \"id\": ").append(t.id).append(",\n")
                     .append("    \"description\": \"").append(escape(t.description)).append("\",\n")
                     .append("    \"status\": \"").append(t.status).append("\",\n")
-                    .append("    \"createdAt\": \"").append(t.createdAt).append("\",\n")
+                    .append("    \"createdAt\": \"").append(t.createAt).append("\",\n")
                     .append("    \"updatedAt\": \"").append(t.updatedAt).append("\"\n")
                     .append("  }").append(i < tasks.size() - 1 ? ",\n" : "\n");
         }
