@@ -103,6 +103,17 @@ public class taskCli {
                 filtered.add(t);
             }
         }
+
+        if (filtered.isEmpty()){
+            System.out.print("No tasks found with status: " + filter);
+            return;
+        }
+
+        System.out.printf("%-4s | %-12s | %-30s | %-20s%n", "ID", "Status", "Description", "Last Updated");
+        System.out.println("----------------------------------------------------------------------");
+        for (Task t : filtered) {
+            System.out.printf("%-4d | %-12s | %-30s | %-20s%n", t.id, t.status, t.description, t.updatedAt);
+        }
     }
 
     // missing  listTasks
@@ -138,4 +149,44 @@ public class taskCli {
         }
         return tasks;
     }
+
+    private static void saveTasks(List<Task> tasks) {
+        StringBuilder json = new StringBuilder("[\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            Task t = tasks.get(i);
+            json.append("  {\n")
+                    .append("    \"id\": ").append(t.id).append(",\n")
+                    .append("    \"description\": \"").append(escape(t.description)).append("\",\n")
+                    .append("    \"status\": \"").append(t.status).append("\",\n")
+                    .append("    \"createdAt\": \"").append(t.createdAt).append("\",\n")
+                    .append("    \"updatedAt\": \"").append(t.updatedAt).append("\"\n")
+                    .append("  }").append(i < tasks.size() - 1 ? ",\n" : "\n");
+        }
+        json.append("]");
+
+        try {
+            Files.write(FILE_PATH, json.toString().getBytes());
+        } catch (IOException e) {
+            System.out.println("Error saving tasks to file: " + e.getMessage());
+        }
+    }
+
+    // --- Helpers ---
+
+    private static String extractJsonValue(String jsonObj, String key) {
+        String keyPattern = "\"" + key + "\":";
+        int startIndex = jsonObj.indexOf(keyPattern);
+        if (startIndex == -1) return "";
+
+        startIndex += keyPattern.length();
+        int endIndex = jsonObj.indexOf(",", startIndex);
+        if (endIndex == -1) endIndex = jsonObj.length();
+
+        String val = jsonObj.substring(startIndex, endIndex).trim();
+        if (val.startsWith("\"") && val.endsWith("\"")) {
+            val = val.substring(1, val.length() - 1);
+        }
+        return val;
+    }
+
 }
