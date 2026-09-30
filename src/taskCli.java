@@ -39,7 +39,7 @@ public class taskCli {
             return;
         }
 
-        String action = args[0].toLoewrCase();
+        String action = args[0].toLowerCase();
         List<Task> tasks = loadTasks();
 
         try {
