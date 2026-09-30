@@ -80,8 +80,32 @@ public class taskCli {
         System.out.print("Task " + id + " delete successfully");
     }
 
+    private static void updateStatus(List<Task> tasks , int id, String status){
+        Task task = findTaskById(tasks , id);
+        if (task == null){
+            System.out.println("Error : Task with ID  " + id + " not found");
+        }
 
-    // missing updateTask , deleteTasks, updateStatus , listTasks
+        task.status = status;
+        task.updatedAt = getCurrentTimestamp();
+        saveTasks(tasks);
+    }
+
+    private static void listTasks(List<Task> tasks , String filter){
+        if (tasks.isEmpty()){
+            System.out.println("No tasks found. ");
+            return;
+        }
+
+        List<Task> filtered = new ArrayList<>();
+        for( Task t : tasks){
+            if("all".equals(filter) || t.status.equalsIgnoreCase(filter)){
+                filtered.add(t);
+            }
+        }
+    }
+
+    // missing  listTasks
     // --- lightweight Native JSON Persistence ---
     private static List<Task> loadTasks(){
         List<Task> tasks = new ArrayList<>();
