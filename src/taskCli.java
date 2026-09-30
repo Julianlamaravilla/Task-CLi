@@ -55,8 +55,22 @@ public class taskCli {
         saveTasks(tasks);
     }
 
-    // missing updateTask , deleteTasks, updateStatus , listTasks
+    private static void updateTask(List<Task> tasks , int id , String newDescription){
+        Task task = findTaskbyId(tasks, id);
+        if (task == null){
+            System.out.println("Error: Task with ID" + id + "not found.");
+            return;
+        }
 
+        task.description = newDescription;
+        task.updatedAt = getCurrentTimestamp();
+        saveTasks(tasks);
+
+        System.out.print("Task " + id + " updated successfully");
+    }
+
+    // missing updateTask , deleteTasks, updateStatus , listTasks
+    // --- lightweight Native JSON Persistence ---
     private static List<Task> loadTasks(){
         List<Task> tasks = new ArrayList<>();
         File file = FILE_PATH.toFile();
@@ -73,9 +87,19 @@ public class taskCli {
 
                 String[] objects = jsonStr.split("\\}\\s*,\\s*\\{");
                 for (String objStr : objects){
-                    // missing for
+                    objStr = objStr.replace("{","").replace("}","");
+                    int id = Integer.parseInt(extractJsonValue(objStr, "id"));
+                    String description = unescape(extractJsonValue(objStr, "description"));
+                    String status = extractJsonValue(objStr, "status");
+                    String createAt = extracJsonvalue(objStr, "createAt");
+                    String updateAt = extracJsonValue(objStr, "updateAt");
+
+                    tasks.add(new Task(id,description, status, createAt, updateAt));
                 }
             }
+        } catch (Exception e){
+            System.out.println("warning: Failed to parse tasks.json. Starting with clean state");
         }
+        return tasks;
     }
 }
