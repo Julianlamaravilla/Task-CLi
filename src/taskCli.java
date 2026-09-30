@@ -69,6 +69,18 @@ public class taskCli {
         System.out.print("Task " + id + " updated successfully");
     }
 
+    private static void deleteTask(List<Task> tasks, int id){
+        boolean removed = tasks.removeIf(t -> t.id == id);
+        if(!removed){
+            System.out.print("Error: Task with ID " + id + " not found");
+            return;
+        }
+
+        saveTasks(tasks);
+        System.out.print("Task " + id + " delete successfully");
+    }
+
+
     // missing updateTask , deleteTasks, updateStatus , listTasks
     // --- lightweight Native JSON Persistence ---
     private static List<Task> loadTasks(){
